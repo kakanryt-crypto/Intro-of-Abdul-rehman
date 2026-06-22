@@ -23,13 +23,32 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: 8.2
-        cache-disabled: true # This completely skips the broken cache service!
+        cache-disabled: true
 
     - name: Build APK
-      run: gradle assembleDebug
+      run: |
+        mkdir -p app/src/main/java/com/example/myfirstapp
+        mkdir -p app/src/main/res/values
+        mkdir -p app/src/main/res/values-ur
+        mkdir -p app/src/main/res/values-es
+        mkdir -p app/src/main/res/values-ar
+        mkdir -p app/src/main/res/values-de
+        mkdir -p app/src/main/res/xml
+        
+        [ -f strings.xml ] && mv strings.xml app/src/main/res/values/strings.xml || true
+        [ -f values-ur/strings.xml ] && mv values-ur/strings.xml app/src/main/res/values-ur/strings.xml || true
+        [ -f values-es/strings.xml ] && mv values-es/strings.xml app/src/main/res/values-es/strings.xml || true
+        [ -f values-ar/strings.xml ] && mv values-ar/strings.xml app/src/main/res/values-ar/strings.xml || true
+        [ -f values-de/strings.xml ] && mv values-de/strings.xml app/src/main/res/values-de/strings.xml || true
+        [ -f locales_config.xml ] && mv locales_config.xml app/src/main/res/xml/locales_config.xml || true
+        [ -f LanguageStartScreen.kt ] && mv LanguageStartScreen.kt app/src/main/java/com/example/myfirstapp/LanguageStartScreen.kt || true
+        [ -f MainActivity.kt ] && mv MainActivity.kt app/src/main/java/com/example/myfirstapp/MainActivity.kt || true
+        [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/AndroidManifest.xml || true
+        
+        gradle assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: abdul-rehman-app
-        path: app/build/outputs/apk/debug/*.apk
+        path: "**/build/outputs/apk/debug/*.apk"
